@@ -1,9 +1,9 @@
 import { getHandlerPath } from 'libs/configHelper/getHandlerPath';
 import { nftTableDynamoDBReadPolicies } from 'resources/policies';
-import { tableName } from 'resources/index';
+import { getCdkProperty } from 'resources/index';
 
 export const getNft = {
-  environment: { NFT_TABLE_NAME: tableName },
+  environment: { NFT_TABLE_NAME: getCdkProperty('dynamodbName')},
   iamRoleStatements: [nftTableDynamoDBReadPolicies],
   handler: getHandlerPath(__dirname),
   events: [

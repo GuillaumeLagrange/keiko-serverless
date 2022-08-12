@@ -1,7 +1,7 @@
-import { tableArn } from '..';
+import { getCdkProperty } from "resources";
 
 export const nftTableDynamoDBReadPolicies = {
   Effect: 'Allow',
-  Resource: [tableArn],
+  Resource: [getCdkProperty('dynamodbArn')],
   Action: ['dynamodb:GetItem', 'dynamodb:Query'],
 };
