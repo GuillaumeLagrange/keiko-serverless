@@ -1,15 +1,17 @@
 import { AWS } from '@serverless/typescript';
 
-import { resources } from './resources';
+import type { ServerlessCdkPluginConfig } from '@swarmion/serverless-cdk-plugin';
+import { OrchestratorDynamodb } from 'resources';
+
 import { functions } from './functions';
 
 const projectName = 'keiko-serverless';
 
-const serverlessConfiguration: AWS = {
+const serverlessConfiguration: AWS & ServerlessCdkPluginConfig = {
   service: `${projectName}`, // Keep it short to have role name below 64
   frameworkVersion: '>=3.0.0',
   configValidationMode: 'error',
-  plugins: ['serverless-esbuild', 'serverless-iam-roles-per-function'],
+  plugins: ['serverless-esbuild', 'serverless-iam-roles-per-function', '@swarmion/serverless-cdk-plugin'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -34,6 +36,8 @@ const serverlessConfiguration: AWS = {
   },
   functions,
   package: { individually: true },
+  construct: OrchestratorDynamodb,
+
   custom: {
     projectName,
     esbuild: {
@@ -48,7 +52,7 @@ const serverlessConfiguration: AWS = {
       concurrency: 5,
     },
   },
-  resources,
+  // resources,
 };
 
 module.exports = serverlessConfiguration;

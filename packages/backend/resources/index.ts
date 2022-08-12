@@ -1,21 +1,25 @@
-import { App, RemovalPolicy, Stack } from '@aws-cdk/core';
-import { AttributeType, Table, BillingMode } from '@aws-cdk/aws-dynamodb';
-
-import { CloudFormationTemplate } from 'libs/configHelper/cloudformation';
 import { PARTITION_KEY, SORT_KEY } from './dynamoDB';
+import ServerlessCdkPlugin, { ServerlessProps } from '@swarmion/serverless-cdk-plugin';
+import { AttributeType, BillingMode, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { Construct } from 'constructs';
 
-const app = new App();
-const stack = new Stack(app);
+export class OrchestratorDynamodb extends ServerlessCdkPlugin.ServerlessConstruct {
+  public dynamodbArn: string;
+  public dynamodbName: string;
 
-const table = new Table(stack, 'NFTtable', {
-  partitionKey: { name: PARTITION_KEY, type: AttributeType.STRING },
-  sortKey: { name: SORT_KEY, type: AttributeType.STRING },
-  billingMode: BillingMode.PAY_PER_REQUEST,
-  removalPolicy: RemovalPolicy.DESTROY,
-});
+  constructor(scope: Construct, id: string, serverlessProps: ServerlessProps) {
+    super(scope, id, serverlessProps);
 
-export const tableArn = stack.resolve(table.tableArn);
-export const tableName = stack.resolve(table.tableName);
+    const table = new Table(this, 'OrchestratorTable', {
+      partitionKey: { name: PARTITION_KEY, type: AttributeType.STRING },
+      sortKey: { name: SORT_KEY, type: AttributeType.STRING },
+      billingMode: BillingMode.PAY_PER_REQUEST,
+    });
 
-export const resources = app.synth().getStackByName(stack.stackName)
-  .template as CloudFormationTemplate;
+    this.dynamodbArn = table.tableArn;
+    this.dynamodbName = table.tableName;
+  }
+}
+
+export const getCdkProperty =
+  ServerlessCdkPlugin.getCdkPropertyHelper<OrchestratorDynamodb>;
